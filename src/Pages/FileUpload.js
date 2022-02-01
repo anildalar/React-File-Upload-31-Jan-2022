@@ -11,6 +11,7 @@ export default function FileUpload() {
     //1. State/Hoook Variable
     const [file,setFile] = useState('')
     const [data,setData] = useState({
+        readToSend: 'disabled',
         percent:0,
         loaded:false
     })
@@ -20,6 +21,11 @@ export default function FileUpload() {
     let handleChange = (e)=>{
         console.log('Changed',e[0])
         setFile(e[0])
+        setData({
+            readToSend: '',
+            percent:0,
+            loaded:false
+        })
     }
     let uploadImage = async (e)=>{ //Fat Arrow Function / Arrow function ES6  e=event
         e.preventDefault();
@@ -38,6 +44,7 @@ export default function FileUpload() {
             //Success
            //await always wait for PO / Promise Object
            setData({
+                readToSend: 'disabled',
                 percent:0,
                 loaded:true
            });
@@ -48,12 +55,14 @@ export default function FileUpload() {
                 onUploadProgress:(progress) =>{
                     console.log(progress);
                     setData({
+                        readToSend: 'disabled',
                         loaded: true,
                         percent: Math.round(progress.loaded / progress.total * 100)
                     })
                 }
             })
             setData({
+                readToSend: '',
                 loaded:false
             });
             toast("file Uploaded Successfully")
@@ -78,7 +87,7 @@ export default function FileUpload() {
                             <label htmlFor="file" className="form-label">Upload File</label>
                             <input onChange={ (e)=>{ handleChange(e.target.files) } } type="file" accept="image/*" name="files" className="form-control" id="file"/>
                         </div>
-                        <button type="submit" className="btn btn-primary">Submit</button>
+                        <button type="submit" className={ `btn btn-primary ${data.readToSend}`}>Submit</button>
                     </form>
 
                     {
