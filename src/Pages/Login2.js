@@ -1,12 +1,46 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import FileUpload2 from './FileUpload2';
+
+const config2 = require('../config2.json');
 
 //RFC = React Funcitonal Compoent
 export default function Login2() {
+
     //1. State/ Hoook Variable
-    const [data,setData] = useState({
-        identifier:'',
-        password:''
+    const [data2,setData2] = useState({
+        identifier:'anil@gmail.com',
+        password:'anil@123'
     }) // {P:V,P:V} = JS Object
+    const [user,setUser] = useState({
+        user:null,
+        is_loggedin:true
+    })
+
+    useEffect(()=>{
+        //get the local storage value
+        try {
+            let user = JSON.parse(localStorage.getItem('user'))
+            if(user){
+                //logged in
+                setUser({
+                    ...user,
+                    is_loggedin:true
+                })
+            }else{
+                //not logged in
+                setUser({
+                    ...user,
+                    is_loggedin:false
+                })
+            }
+            
+        } catch (error) {
+            
+        }
+
+        alert('Page Loaded successfully!');
+    },[])
 
     //2. Functions defination
     let handleChange = (e)=>{ // e = event e is a formal argument
@@ -14,9 +48,9 @@ export default function Login2() {
         if(e.target.classList.contains('a_username')){
             //username
             console.log(e.target.value);
-            setData({
-                //get the previous data and place here
-                ...data,
+            setData2({
+                //get the previous data2 and place here
+                ...data2,
                 //Now set the value of key/property
                 identifier: e.target.value
             });
@@ -24,19 +58,40 @@ export default function Login2() {
         }
         if(e.target.classList.contains('a_password')){
             //password
-            setData({
-                //get the previous data and place here
-                ...data,
+            setData2({
+                //get the previous data2 and place here
+                ...data2,
                 //Now set the value of key/property
                 password: e.target.value
             });
             console.log('password block')
         }
     }
-    let login = (e)=>{
+    let login = async (e)=>{
         e.preventDefault();
-        console.log(data);
+        console.log(data2);
         console.log("ok")
+
+        try {
+            let {data}= await axios.post(`${config2.dev_api_url}/api/auth/local`, {
+                identifier: data2.identifier,
+                password:data2.password ,
+              });
+    
+            console.log(data);
+    
+            setUser({
+                //get the previous data and place here
+                ...user,
+                is_loggedin:true
+            });
+    
+            localStorage.setItem("user",JSON.stringify(data))   
+        } catch (error) {
+           console.log(error) 
+        }
+        // await PO Promise Object
+        
     }
 
 
@@ -60,6 +115,10 @@ export default function Login2() {
                     </form>
                 </div>
             </div>
+            { user.is_loggedin &&
+                <FileUpload2 />
+            }
+            
             
 
         </>
